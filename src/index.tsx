@@ -24,14 +24,14 @@ ReactDOM.render(
       camera={{ position: [0, 0, 3], fov: 75 }}
       dpr={Math.min(window.devicePixelRatio, 2)}
     >
-      <Lights />
       <Suspense fallback={null}>
         <App />
       </Suspense>
-      <Stats />
-      <Leva />
+      <Lights />
       <OrbitControls />
     </Canvas>
+    <Stats />
+    <Leva />
     <Loader dataInterpolation={(p) => `Loading ${p.toFixed(0)}%`} />
   </React.StrictMode>,
   document.getElementById("root")
