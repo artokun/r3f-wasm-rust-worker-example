@@ -1,5 +1,7 @@
 React-Three-Fiber typescript starter
 
+Demo: https://r3f-typescript-starter.artlongbottom.com/
+
 ### Eject and add `glslify-loader` + `raw-loader`
 
 - `yarn add glslify-loader raw-loader`
