@@ -86,3 +86,75 @@ const getRsTime = useCallback(async () => {
 ```
   onClick={getRsTime}
 ```
+
+## Workers
+
+1. Add `workerize-loader`
+1. Create a worker.ts file in `src/workers`
+1. Add the following lines to `worker.ts`
+
+```ts
+const rust = import("../wasm/pkg");
+
+export const fibonacci = (n: number): number => {
+  if (n < 1) {
+    return 0;
+  }
+
+  return fibonacci(n - 1) + fibonacci(n - 2);
+};
+
+export const fibonacciRust = (n: number): Promise<number> =>
+  rust.then((wasm) => wasm.fibonacci(n));
+```
+
+1. Add a declarations file in `src/workers`
+
+```ts
+declare module "workerize-loader!*" {
+  type FlattenedPromise<T> = unknown extends T
+    ? Promise<T>
+    : T extends Promise<infer U>
+    ? T
+    : Promise<T>;
+
+  type AnyFunction = (...args: any[]) => any;
+  type Async<F extends AnyFunction> = (
+    ...args: Parameters<F>
+  ) => FlattenedPromise<ReturnType<F>>;
+
+  type Workerized<T> = Worker &
+    { [K in keyof T]: T[K] extends AnyFunction ? Async<T[K]> : never };
+
+  function createInstance<T>(): Workerized<T>;
+  export = createInstance;
+}
+```
+
+1. Add the following to App.tsx
+
+```tsx
+/*eslint-disable import/no-webpack-loader-syntax*/
+import worker from "workerize-loader!./workers/worker";
+
+let instance = worker<{
+  fibonacci: (n: number) => number;
+  fibonacciRust: (n: number) => number;
+}>();
+```
+
+1. Finally update the async callbacks to use the worker instance
+
+```tsx
+const getJsTimeAsync = useCallback(async () => {
+  const startTime = Date.now();
+  await instance.fibonacci(42);
+  setJsTime((Math.floor(Date.now() - startTime) / 1000).toFixed(2) + "s JS");
+}, []);
+
+const getRsTimeAsync = useCallback(async () => {
+  const startTime = Date.now();
+  await instance.fibonacciRust(42);
+  setRsTime((Math.floor(Date.now() - startTime) / 1000).toFixed(2) + "s RS");
+}, []);
+```
