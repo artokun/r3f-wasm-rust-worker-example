@@ -4,6 +4,14 @@ import { useFrame } from "@react-three/fiber";
 import { Box, Html } from "@react-three/drei";
 import { useControls } from "leva";
 
+/*eslint-disable import/no-webpack-loader-syntax*/
+import worker from "workerize-loader!./workers/worker";
+
+let instance = worker<{
+  fibonacci: (n: number) => number;
+  fibonacciRust: (n: number) => number;
+}>();
+
 const rust = import("./wasm/pkg");
 
 const fibonacci = (n: number): number => {
@@ -27,15 +35,10 @@ const App: React.FC = () => {
   }, []);
 
   const getJsTimeAsync = useCallback(async () => {
+    setJsTime("Fetching...");
     const startTime = Date.now();
-    new Promise((resolve) => {
-      fibonacci(42);
-      resolve(null);
-    }).then(() => {
-      setJsTime(
-        (Math.floor(Date.now() - startTime) / 1000).toFixed(2) + "s JS"
-      );
-    });
+    await instance.fibonacci(42);
+    setJsTime((Math.floor(Date.now() - startTime) / 1000).toFixed(2) + "s JS");
   }, []);
 
   const getRsTime = useCallback(async () => {
@@ -46,16 +49,10 @@ const App: React.FC = () => {
   }, []);
 
   const getRsTimeAsync = useCallback(async () => {
+    setRsTime("Fetching...");
     const startTime = Date.now();
-    const wasm = await rust;
-    new Promise((resolve) => {
-      wasm.fibonacci(42);
-      resolve(null);
-    }).then(() => {
-      setRsTime(
-        (Math.floor(Date.now() - startTime) / 1000).toFixed(2) + "s RS"
-      );
-    });
+    await instance.fibonacciRust(42);
+    setRsTime((Math.floor(Date.now() - startTime) / 1000).toFixed(2) + "s RS");
   }, []);
 
   const { colorLeft, colorRight, speed } = useControls({
@@ -80,8 +77,8 @@ const App: React.FC = () => {
         ref={boxRef1}
         args={[1, 1, 1]}
         position={[-1, 0, 0]}
-        onClick={getJsTime}
-        // onClick={getJsTimeAsync}
+        // onClick={getJsTime}
+        onClick={getJsTimeAsync}
       >
         <meshStandardMaterial color={colorLeft} toneMapped={false} />
         <Html center style={{ pointerEvents: "none" }}>
@@ -94,8 +91,8 @@ const App: React.FC = () => {
         ref={boxRef2}
         args={[1, 1, 1]}
         position={[1, 0, 0]}
-        onClick={getRsTime}
-        // onClick={getRsTimeAsync}
+        // onClick={getRsTime}
+        onClick={getRsTimeAsync}
       >
         <meshStandardMaterial color={colorRight} toneMapped={false} />
         <Html center style={{ pointerEvents: "none" }}>
