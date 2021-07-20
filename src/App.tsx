@@ -22,14 +22,14 @@ const App: React.FC = () => {
 
   const getJsTime = useCallback(() => {
     const startTime = Date.now();
-    fibonacci(40);
+    fibonacci(42);
     setJsTime((Math.floor(Date.now() - startTime) / 1000).toFixed(2) + "s JS");
   }, []);
 
   const getJsTimeAsync = useCallback(async () => {
     const startTime = Date.now();
     new Promise((resolve) => {
-      fibonacci(40);
+      fibonacci(42);
       resolve(null);
     }).then(() => {
       setJsTime(
@@ -41,8 +41,21 @@ const App: React.FC = () => {
   const getRsTime = useCallback(async () => {
     const startTime = Date.now();
     const wasm = await rust;
-    wasm.fibonacci(40);
+    wasm.fibonacci(42);
     setRsTime((Math.floor(Date.now() - startTime) / 1000).toFixed(2) + "s RS");
+  }, []);
+
+  const getRsTimeAsync = useCallback(async () => {
+    const startTime = Date.now();
+    const wasm = await rust;
+    new Promise((resolve) => {
+      wasm.fibonacci(42);
+      resolve(null);
+    }).then(() => {
+      setRsTime(
+        (Math.floor(Date.now() - startTime) / 1000).toFixed(2) + "s RS"
+      );
+    });
   }, []);
 
   const { colorLeft, colorRight, speed } = useControls({
@@ -82,6 +95,7 @@ const App: React.FC = () => {
         args={[1, 1, 1]}
         position={[1, 0, 0]}
         onClick={getRsTime}
+        // onClick={getRsTimeAsync}
       >
         <meshStandardMaterial color={colorRight} toneMapped={false} />
         <Html center style={{ pointerEvents: "none" }}>
