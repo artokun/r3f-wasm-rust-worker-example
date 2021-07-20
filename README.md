@@ -1,5 +1,6 @@
+1. Eject!
 1. Go to root directory of the project and run `cargo new wasm`.
-2. Open the generated `Cargo.toml` file and add the following lines after `[package]`:
+1. Open the generated `Cargo.toml` file and add the following lines after `[package]`:
 
 ```toml
 [lib]
@@ -10,7 +11,7 @@ path = "src/lib.rs"
 wasm-bindgen = "0.2.74"
 ```
 
-3. Add the following lines to `wasm/src/main.rs`:
+AND Add the following lines to `wasm/src/main.rs`:
 
 ```rust
 use wasm_bindgen::prelude::*;
@@ -32,14 +33,12 @@ fn main() {
 ```
 
 4. Test by running `cargo run` in the wasm directory.
-5. Delete generated files in wasm directory.
-6. Rename main.rs to lib.rs
-7. Comment out `main()` function from lib.rs
-8. Watch as a target folder is created and everything fixes itself.
-9. Eject
-10. Add wasm dependencies `yarn add @wasm-tool/wasm-pack-plugin wasm-loader`
-11. Import `const WasmPackPlugin = require("@wasm-tool/wasm-pack-plugin");` at the top of `config/webpack.config.js`
-12. Search for `HtmlWebpackPlugin` in `config/webpack.config.js` and add the following lines AFTER it:
+5. Rename main.rs to lib.rs
+6. Remove `main()` function from lib.rs
+7. Watch as a target folder is created and everything fixes itself.
+8. Add wasm dependencies `yarn add @wasm-tool/wasm-pack-plugin wasm-loader`
+9. Import `const WasmPackPlugin = require("@wasm-tool/wasm-pack-plugin");` at the top of `config/webpack.config.js`
+10. Search for `HtmlWebpackPlugin` in `config/webpack.config.js` and add the following lines AFTER it:
 
 ```js
 new WasmPackPlugin({
