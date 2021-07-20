@@ -4,6 +4,8 @@ import { useFrame } from "@react-three/fiber";
 import { Box, Html } from "@react-three/drei";
 import { useControls } from "leva";
 
+const rust = import("./wasm/pkg");
+
 const fibonacci = (n: number): number => {
   if (n < 1) {
     return 0;
@@ -34,6 +36,13 @@ const App: React.FC = () => {
         (Math.floor(Date.now() - startTime) / 1000).toFixed(2) + "s JS"
       );
     });
+  }, []);
+
+  const getRsTime = useCallback(async () => {
+    const startTime = Date.now();
+    const wasm = await rust;
+    wasm.fibonacci(40);
+    setRsTime((Math.floor(Date.now() - startTime) / 1000).toFixed(2) + "s RS");
   }, []);
 
   const { colorLeft, colorRight, speed } = useControls({
@@ -68,7 +77,12 @@ const App: React.FC = () => {
       </Box>
 
       {/* Green Rust Box */}
-      <Box ref={boxRef2} args={[1, 1, 1]} position={[1, 0, 0]}>
+      <Box
+        ref={boxRef2}
+        args={[1, 1, 1]}
+        position={[1, 0, 0]}
+        onClick={getRsTime}
+      >
         <meshStandardMaterial color={colorRight} toneMapped={false} />
         <Html center style={{ pointerEvents: "none" }}>
           <p style={{ textAlign: "center", width: 100 }}>{rsTime}</p>
