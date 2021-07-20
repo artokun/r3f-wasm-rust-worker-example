@@ -1,17 +1,33 @@
-import React, { useRef } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import * as THREE from "three";
 import { useFrame } from "@react-three/fiber";
-import { Box } from "@react-three/drei";
+import { Box, Html } from "@react-three/drei";
 import { useControls } from "leva";
+
+const fibonacci = (n: number): number => {
+  if (n < 1) {
+    return 0;
+  }
+
+  return fibonacci(n - 1) + fibonacci(n - 2);
+};
 
 const App: React.FC = () => {
   const boxRef1 = useRef<THREE.Mesh>();
   const boxRef2 = useRef<THREE.Mesh>();
+  const [jsTime, setJsTime] = useState("Start JS time");
+  const [rsTime, setRsTime] = useState("Start RS Wasm time");
+
+  const getJsTime = useCallback(() => {
+    const startTime = Date.now();
+    fibonacci(40);
+    setJsTime((Math.floor(Date.now() - startTime) / 1000).toFixed(2) + "s JS");
+  }, []);
 
   const { colorLeft, colorRight, speed } = useControls({
     colorLeft: "#ff0000",
     colorRight: "#00FF00",
-    speed: [0, 0],
+    speed: [1, 1],
   });
 
   useFrame(({ clock }) => {
@@ -25,14 +41,25 @@ const App: React.FC = () => {
 
   return (
     <>
-      {/* Good for 3D that needs to have nice shadow values */}
-      <Box ref={boxRef1} args={[1, 1, 1]} position={[-1, 0, 0]}>
+      {/* Red JS Box */}
+      <Box
+        ref={boxRef1}
+        args={[1, 1, 1]}
+        position={[-1, 0, 0]}
+        onClick={getJsTime}
+      >
         <meshStandardMaterial color={colorLeft} toneMapped={false} />
+        <Html center style={{ pointerEvents: "none" }}>
+          <p style={{ textAlign: "center", width: 100 }}>{jsTime}</p>
+        </Html>
       </Box>
 
-      {/* Good for UI that needs to map to CSS exactly */}
+      {/* Green Rust Box */}
       <Box ref={boxRef2} args={[1, 1, 1]} position={[1, 0, 0]}>
-        <meshBasicMaterial color={colorRight} toneMapped={false} />
+        <meshStandardMaterial color={colorRight} toneMapped={false} />
+        <Html center style={{ pointerEvents: "none" }}>
+          <p style={{ textAlign: "center", width: 100 }}>{rsTime}</p>
+        </Html>
       </Box>
     </>
   );
