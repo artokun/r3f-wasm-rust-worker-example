@@ -24,6 +24,18 @@ const App: React.FC = () => {
     setJsTime((Math.floor(Date.now() - startTime) / 1000).toFixed(2) + "s JS");
   }, []);
 
+  const getJsTimeAsync = useCallback(async () => {
+    const startTime = Date.now();
+    new Promise((resolve) => {
+      fibonacci(40);
+      resolve(null);
+    }).then(() => {
+      setJsTime(
+        (Math.floor(Date.now() - startTime) / 1000).toFixed(2) + "s JS"
+      );
+    });
+  }, []);
+
   const { colorLeft, colorRight, speed } = useControls({
     colorLeft: "#ff0000",
     colorRight: "#00FF00",
@@ -47,6 +59,7 @@ const App: React.FC = () => {
         args={[1, 1, 1]}
         position={[-1, 0, 0]}
         onClick={getJsTime}
+        // onClick={getJsTimeAsync}
       >
         <meshStandardMaterial color={colorLeft} toneMapped={false} />
         <Html center style={{ pointerEvents: "none" }}>
