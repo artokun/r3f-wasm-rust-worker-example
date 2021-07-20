@@ -20,14 +20,14 @@ const App: React.FC = () => {
 
   const getJsTime = useCallback(() => {
     const startTime = Date.now();
-    fibonacci(40);
+    fibonacci(42);
     setJsTime((Math.floor(Date.now() - startTime) / 1000).toFixed(2) + "s JS");
   }, []);
 
   const getJsTimeAsync = useCallback(async () => {
     const startTime = Date.now();
     new Promise((resolve) => {
-      fibonacci(40);
+      fibonacci(42);
       resolve(null);
     }).then(() => {
       setJsTime(
